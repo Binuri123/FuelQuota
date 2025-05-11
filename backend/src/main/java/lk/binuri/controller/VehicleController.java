@@ -27,7 +27,7 @@ public class VehicleController {
             customErrorException.addError("vehicleNo","This vehicle is not verified...");
             throw customErrorException;
         }
-        
+
         vehicleRepository.save(vehicle);
         return vehicle;
     }

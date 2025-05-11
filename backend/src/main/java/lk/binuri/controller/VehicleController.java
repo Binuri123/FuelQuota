@@ -5,10 +5,12 @@ import lk.binuri.entity.Vehicle;
 import lk.binuri.repository.VehicleRepository;
 import lk.binuri.util.CustomErrorException;
 import lk.binuri.util.RmvMockApi;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@CrossOrigin
 @RestController
 public class VehicleController {
     VehicleRepository vehicleRepository;

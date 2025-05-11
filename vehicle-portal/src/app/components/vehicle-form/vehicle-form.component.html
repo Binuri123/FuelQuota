@@ -1,0 +1,121 @@
+<div class="container">
+    <div class="card mt-3">
+        <div class="card-header bg-info text-white">
+            <h2 class="card-title m-0">Vehicle Registraton Form</h2>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="vehicle-form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Vehicle No</mat-label>
+                            <input matInput formControlName="vehicleNo" required />
+                            <mat-error *ngIf="vehicleForm.get('vehicleNo')?.hasError('required')">
+                                Vehicle number is required.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('vehicleNo')?.hasError('pattern')">
+                                Format must be ABC-1234.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Chassis No</mat-label>
+                            <input matInput formControlName="chassisNo" required />
+                            <mat-error *ngIf="vehicleForm.get('chassisNo')?.hasError('pattern')">
+                                Must be 10–60 characters.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('chassisNo')?.hasError('required')">
+                                Chassis No is required.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Vehicle Type</mat-label>
+                            <mat-select formControlName="type">
+                                <mat-option *ngFor="let type of vehicleTypes" [value]="type">
+                                    {{ type }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="vehicleForm.get('type')?.hasError('required')">
+                                Please select a vehicle type.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Fuel Type</mat-label>
+                            <mat-select formControlName="fuelType">
+                                <mat-option *ngFor="let fuel of fuelTypes" [value]="fuel">
+                                    {{ fuel }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="vehicleForm.get('fuelType')?.hasError('required')">
+                                Please select a fuel type.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Owner NIC</mat-label>
+                            <input matInput formControlName="ownerNic" required />
+                            <mat-error *ngIf="vehicleForm.get('ownerNic')?.hasError('pattern')">
+                                NIC must be 12 digits or 9 digits + V/X.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('ownerNic')?.hasError('required')">
+                                NIC is required.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Mobile Number</mat-label>
+                            <input matInput formControlName="mobile" required />
+                            <mat-error *ngIf="vehicleForm.get('mobile')?.hasError('pattern')">
+                                Must be 10 digits starting with 0.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('mobile')?.hasError('required')">
+                                Mobile No is required.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>First Name</mat-label>
+                            <input matInput formControlName="firstName" required />
+                            <mat-error *ngIf="vehicleForm.get('firstName')?.errors">
+                                Must be 3+ characters. Only letters, spaces, apostrophes.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Last Name</mat-label>
+                            <input matInput formControlName="lastName" required />
+                            <mat-error *ngIf="vehicleForm.get('lastName')?.errors">
+                                Must be 3+ characters. Only letters, spaces, apostrophes.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <mat-form-field appearance="outline" class="w-100 mb-3">
+                    <mat-label>Address</mat-label>
+                    <textarea matInput formControlName="address" required></textarea>
+                    <mat-error *ngIf="vehicleForm.get('address')?.errors">
+                        Address must be 5–500 characters.
+                    </mat-error>
+                </mat-form-field>
+                <div class="text-right">
+                    <button class="btn btn-primary" type="submit">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

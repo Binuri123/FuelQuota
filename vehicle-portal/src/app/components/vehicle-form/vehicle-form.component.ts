@@ -20,38 +20,38 @@ export class VehicleFormComponent {
   ngOnInit(): void {
     this.vehicleForm = this.fb.group({
       vehicleNo: [
-        'CAK-3429',
+        '',
         [
           Validators.required,
           Validators.pattern('^[A-Za-z0-9]{1,4}-\\d{4}$'),
         ],
       ],
       chassisNo: [
-        'CHS1000000000001',
+        '',
         [
           Validators.required,
           Validators.minLength(10),
           Validators.maxLength(60),
         ],
       ],
-      type: ['Van', [Validators.required]],
-      fuelType: ['Diesel', [Validators.required]],
+      type: ['', [Validators.required]],
+      fuelType: ['', [Validators.required]],
       ownerNic: [
-        '199775502761',
+        '',
         [
           Validators.required,
           Validators.pattern('^((\\d{12})|(\\d{9}[vVxX]))$'),
         ],
       ],
       mobile: [
-        '0702825863',
+        '',
         [
           Validators.required,
           Validators.pattern('^0?[^0\\D]\\d{8}$'),
         ],
       ],
       firstName: [
-        'Nimal',
+        '',
         [
           Validators.required,
           Validators.minLength(3),
@@ -60,7 +60,7 @@ export class VehicleFormComponent {
         ],
       ],
       lastName: [
-        'Perera',
+        '',
         [
           Validators.required,
           Validators.minLength(3),
@@ -69,7 +69,7 @@ export class VehicleFormComponent {
         ],
       ],
       address: [
-        'C11,Railway Flats,Dematagoda,Colombo 09',
+        '',
         [
           Validators.required,
           Validators.minLength(5),

@@ -13,6 +13,9 @@
                             <mat-error *ngIf="vehicleForm.get('vehicleNo')?.hasError('required')">
                                 Vehicle number is required.
                             </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('vehicleNo')?.hasError('servererror')">
+                                {{vehicleForm.get('vehicleNo')?.getError('servererror')}}
+                            </mat-error>
                             <mat-error *ngIf="vehicleForm.get('vehicleNo')?.hasError('pattern')">
                                 Format must be ABC-1234.
                             </mat-error>
@@ -22,8 +25,14 @@
                         <mat-form-field appearance="outline" class="w-100 mb-3">
                             <mat-label>Chassis No</mat-label>
                             <input matInput formControlName="chassisNo" required />
-                            <mat-error *ngIf="vehicleForm.get('chassisNo')?.hasError('pattern')">
-                                Must be 10–60 characters.
+                            <mat-error *ngIf="vehicleForm.get('chassisNo')?.hasError('minlength')">
+                                Must be 10+ characters.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('chassisNo')?.hasError('maxlength')">
+                                Must be less than 60 characters.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('chassisNo')?.hasError('servererror')">
+                                {{vehicleForm.get('chassisNo')?.getError('servererror')}}
                             </mat-error>
                             <mat-error *ngIf="vehicleForm.get('chassisNo')?.hasError('required')">
                                 Chassis No is required.
@@ -43,6 +52,9 @@
                             <mat-error *ngIf="vehicleForm.get('type')?.hasError('required')">
                                 Please select a vehicle type.
                             </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('type')?.hasError('servererror')">
+                                {{vehicleForm.get('type')?.getError('servererror')}}
+                            </mat-error>
                         </mat-form-field>
                     </div>
                     <div class="col-md-6">
@@ -56,6 +68,9 @@
                             <mat-error *ngIf="vehicleForm.get('fuelType')?.hasError('required')">
                                 Please select a fuel type.
                             </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('fuelType')?.hasError('servererror')">
+                                {{vehicleForm.get('fuelType')?.getError('servererror')}}
+                            </mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -66,6 +81,9 @@
                             <input matInput formControlName="ownerNic" required />
                             <mat-error *ngIf="vehicleForm.get('ownerNic')?.hasError('pattern')">
                                 NIC must be 12 digits or 9 digits + V/X.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('ownerNic')?.hasError('servererror')">
+                                {{vehicleForm.get('ownerNic')?.getError('servererror')}}
                             </mat-error>
                             <mat-error *ngIf="vehicleForm.get('ownerNic')?.hasError('required')">
                                 NIC is required.
@@ -82,6 +100,9 @@
                             <mat-error *ngIf="vehicleForm.get('mobile')?.hasError('required')">
                                 Mobile No is required.
                             </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('mobile')?.hasError('servererror')">
+                                {{vehicleForm.get('mobile')?.getError('servererror')}}
+                            </mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -90,8 +111,20 @@
                         <mat-form-field appearance="outline" class="w-100 mb-3">
                             <mat-label>First Name</mat-label>
                             <input matInput formControlName="firstName" required />
-                            <mat-error *ngIf="vehicleForm.get('firstName')?.errors">
-                                Must be 3+ characters. Only letters, spaces, apostrophes.
+                            <mat-error *ngIf="vehicleForm.get('firstName')?.hasError('pattern')">
+                                Only letters, spaces, apostrophes.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('firstName')?.hasError('minlength')">
+                                Must be 3+ characters.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('firstName')?.hasError('maxlength')">
+                                Must be less than 100 characters.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('firstName')?.hasError('required')">
+                                First Name is required.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('firstName')?.hasError('servererror')">
+                                {{vehicleForm.get('firstName')?.getError('servererror')}}
                             </mat-error>
                         </mat-form-field>
                     </div>
@@ -99,8 +132,20 @@
                         <mat-form-field appearance="outline" class="w-100 mb-3">
                             <mat-label>Last Name</mat-label>
                             <input matInput formControlName="lastName" required />
-                            <mat-error *ngIf="vehicleForm.get('lastName')?.errors">
+                            <mat-error *ngIf="vehicleForm.get('lastName')?.hasError('pattern')">
                                 Must be 3+ characters. Only letters, spaces, apostrophes.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('lastName')?.hasError('minlength')">
+                                Must be 3+ characters.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('lastName')?.hasError('maxlength')">
+                                Must be less than 100 characters.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('lastName')?.hasError('required')">
+                                Last Name is required.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('lastName')?.hasError('servererror')">
+                                {{vehicleForm.get('lastName')?.getError('servererror')}}
                             </mat-error>
                         </mat-form-field>
                     </div>
@@ -108,8 +153,17 @@
                 <mat-form-field appearance="outline" class="w-100 mb-3">
                     <mat-label>Address</mat-label>
                     <textarea matInput formControlName="address" required></textarea>
-                    <mat-error *ngIf="vehicleForm.get('address')?.errors">
-                        Address must be 5–500 characters.
+                    <mat-error *ngIf="vehicleForm.get('address')?.hasError('minlength')">
+                        Must be 5+ characters.
+                    </mat-error>
+                    <mat-error *ngIf="vehicleForm.get('address')?.hasError('maxlength')">
+                        Must be less than 500 characters.
+                    </mat-error>
+                    <mat-error *ngIf="vehicleForm.get('address')?.hasError('required')">
+                        Address is required.
+                    </mat-error>
+                    <mat-error *ngIf="vehicleForm.get('address')?.hasError('servererror')">
+                        {{vehicleForm.get('address')?.getError('servererror')}}
                     </mat-error>
                 </mat-form-field>
                 <div class="text-right">

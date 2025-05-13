@@ -42,7 +42,7 @@ public class Vehicle {
     private String ownerNic;
 
     @NotBlank(message = "Please enter the owner's mobile number.")
-    @Pattern(regexp = "^0?\\d{9}$", message = "Mobile number must be 10 digits, starting with 0.")
+    @Pattern(regexp = "^0?[^0\\D]\\d{8}$", message = "Mobile number must be 10 digits, starting with 0.")
     @Column(unique = true, nullable = false, length = 10)
     private String mobile;
 

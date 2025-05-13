@@ -1,34 +1,42 @@
 package lk.binuri.controller;
 
+import com.google.zxing.WriterException;
 import jakarta.validation.Valid;
 import lk.binuri.entity.Vehicle;
 import lk.binuri.repository.VehicleRepository;
+import lk.binuri.service.QRCodeService;
 import lk.binuri.util.CustomErrorException;
 import lk.binuri.util.RmvMockApi;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
 public class VehicleController {
     VehicleRepository vehicleRepository;
     RmvMockApi rmvMockApi;
+    QRCodeService qrCodeService;
 
-    public VehicleController(VehicleRepository vehicleRepository, RmvMockApi rmvMockApi) {
+    public VehicleController(VehicleRepository vehicleRepository, RmvMockApi rmvMockApi, QRCodeService qrCodeService) {
         this.vehicleRepository = vehicleRepository;
         this.rmvMockApi = rmvMockApi;
+        this.qrCodeService = qrCodeService;
     }
 
     @PostMapping("/register")
-    public Vehicle register(@RequestBody @Valid Vehicle vehicle) {
+    public Vehicle register(@RequestBody @Valid Vehicle vehicle) throws IOException, WriterException {
         checkDuplicateValues(vehicle);
-        if(!rmvMockApi.verify(vehicle.getVehicleNo(),vehicle.getChassisNo(),vehicle.getType())){
+        if (!rmvMockApi.verify(vehicle.getVehicleNo(), vehicle.getChassisNo(), vehicle.getType())) {
             CustomErrorException customErrorException = new CustomErrorException();
-            customErrorException.addError("vehicleNo","This vehicle is not verified...");
+            customErrorException.addError("vehicleNo", "This vehicle is not verified...");
             throw customErrorException;
         }
+
+        String qrText=vehicle.getVehicleNo()+"|"+ UUID.randomUUID();
+        byte[] qrCode = qrCodeService.generateQRCode(qrText,200,200);
+        vehicle.setQr(qrCode);
 
         vehicleRepository.save(vehicle);
         return vehicle;

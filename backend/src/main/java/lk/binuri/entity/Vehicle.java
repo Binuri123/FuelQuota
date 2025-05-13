@@ -1,5 +1,6 @@
 package lk.binuri.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -63,4 +64,9 @@ public class Vehicle {
     @Size(min = 5, max = 500, message = "Address must be at least 5 characters.")
     @Column(nullable = false, columnDefinition = "TEXT")
     private String address;
+
+    @Lob
+    @JsonIgnore
+    @Column(name = "qr", columnDefinition = "MEDIUMBLOB")
+    private byte[] qr;
 }

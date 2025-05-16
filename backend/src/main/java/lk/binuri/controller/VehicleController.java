@@ -2,11 +2,12 @@ package lk.binuri.controller;
 
 import com.google.zxing.WriterException;
 import jakarta.validation.Valid;
+import lk.binuri.dto.VehicleRegisterRequestDTO;
 import lk.binuri.entity.User;
 import lk.binuri.entity.Vehicle;
 import lk.binuri.repository.UserRepository;
 import lk.binuri.repository.VehicleRepository;
-import lk.binuri.security.AuthResponse;
+import lk.binuri.dto.AuthResponseDTO;
 import lk.binuri.security.JWTService;
 import lk.binuri.security.UserType;
 import lk.binuri.service.QRCodeService;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -26,61 +28,70 @@ import java.util.UUID;
 @RestController
 public class VehicleController {
     private final VehicleRepository vehicleRepository;
-    private final UserRepository userRepository;
     private final RmvMockApi rmvMockApi;
     private final QRCodeService qrCodeService;
-    private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public VehicleController(
             VehicleRepository vehicleRepository,
-            UserRepository userRepository,
             RmvMockApi rmvMockApi,
             QRCodeService qrCodeService,
-            AuthenticationManager authenticationManager,
-            JWTService jwtService
+            JWTService jwtService,
+            PasswordEncoder passwordEncoder
     ) {
         this.vehicleRepository = vehicleRepository;
         this.rmvMockApi = rmvMockApi;
         this.qrCodeService = qrCodeService;
-        this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody @Valid Vehicle vehicle) throws IOException, WriterException {
-        checkDuplicateValues(vehicle);
-        if (!rmvMockApi.verify(vehicle.getVehicleNo(), vehicle.getChassisNo(), vehicle.getType())) {
+    public AuthResponseDTO register(@RequestBody @Valid VehicleRegisterRequestDTO vehicleRegisterRequest) throws IOException, WriterException {
+        checkDuplicateValues(vehicleRegisterRequest);
+
+        if (!rmvMockApi.verify(vehicleRegisterRequest.getVehicleNo(), vehicleRegisterRequest.getChassisNo(), vehicleRegisterRequest.getType())) {
             CustomErrorException customErrorException = new CustomErrorException();
             customErrorException.addError("vehicleNo", "This vehicle is not verified...");
             throw customErrorException;
         }
 
-        String qrText = vehicle.getVehicleNo() + "|" + UUID.randomUUID();
-        byte[] qrCode = qrCodeService.generateQRCode(qrText, 200, 200);
+        Vehicle vehicle = new Vehicle();
+        vehicle.setVehicleNo(vehicleRegisterRequest.getVehicleNo());
+        vehicle.setChassisNo(vehicleRegisterRequest.getChassisNo());
+        vehicle.setType(vehicleRegisterRequest.getType());
+        vehicle.setFirstName(vehicleRegisterRequest.getFirstName());
+        vehicle.setLastName(vehicleRegisterRequest.getLastName());
+        vehicle.setFuelType(vehicleRegisterRequest.getFuelType());
+        vehicle.setAddress(vehicleRegisterRequest.getAddress());
+        vehicle.setOwnerNic(vehicleRegisterRequest.getOwnerNic());
+        vehicle.setMobile(vehicleRegisterRequest.getMobile());
+
+        byte[] qrCode = qrCodeService.generateQRCode(vehicle.getVehicleNo());
         vehicle.setQr(qrCode);
 
         User user = new User();
         user.setUsername(vehicle.getVehicleNo());
+        user.setPassword(passwordEncoder.encode(vehicleRegisterRequest.getPassword()));
         user.setUserType(UserType.VEHICLE);
         vehicle.setUser(user);
         vehicleRepository.save(vehicle);
 
         String token = jwtService.generateToken(user);
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setUsername(vehicle.getVehicleNo());
-        authResponse.setToken(token);
-        authResponse.setRole(user.getUserType());
-        authResponse.setData(vehicle);
-        return authResponse;
+        AuthResponseDTO authResponseDTO = new AuthResponseDTO();
+        authResponseDTO.setUsername(vehicle.getVehicleNo());
+        authResponseDTO.setToken(token);
+        authResponseDTO.setRole(user.getUserType());
+        authResponseDTO.setData(vehicle);
+        return authResponseDTO;
     }
 
-    private void checkDuplicateValues(Vehicle vehicle) {
-        Vehicle vehicleByVehicleNo = vehicleRepository.findByVehicleNo(vehicle.getVehicleNo());
-        Vehicle vehicleByChassisNo = vehicleRepository.findByChassisNo(vehicle.getChassisNo());
-        Vehicle vehicleByNic = vehicleRepository.findByOwnerNic(vehicle.getOwnerNic());
-        Vehicle vehicleByMobileNo = vehicleRepository.findByMobile(vehicle.getMobile());
+    private void checkDuplicateValues(VehicleRegisterRequestDTO vehicleRegisterRequest) {
+        Vehicle vehicleByVehicleNo = vehicleRepository.findByVehicleNo(vehicleRegisterRequest.getVehicleNo());
+        Vehicle vehicleByChassisNo = vehicleRepository.findByChassisNo(vehicleRegisterRequest.getChassisNo());
+        Vehicle vehicleByNic = vehicleRepository.findByOwnerNic(vehicleRegisterRequest.getOwnerNic());
+        Vehicle vehicleByMobileNo = vehicleRepository.findByMobile(vehicleRegisterRequest.getMobile());
 
         CustomErrorException customErrorException = new CustomErrorException();
 
@@ -124,7 +135,7 @@ public class VehicleController {
     }
 
     @GetMapping("/test")
-    public String test(){
+    public String test() {
         return "Hello World";
     }
 }

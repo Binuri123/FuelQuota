@@ -3,6 +3,9 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { FuelQuotaService } from '../../services/fuel-quota.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { matchPasswords } from '../../validators/match-passwords';
+import { AuthUserService } from '../../services/auth-user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vehicle-form',
@@ -15,9 +18,19 @@ export class VehicleFormComponent {
   vehicleTypes = ['Car', 'Van', 'Three Wheel', 'Bike', 'Lorry', 'Bus'];
   fuelTypes = ['Petrol', 'Diesel'];
 
-  constructor(private fb: FormBuilder, private fuelQuotaService: FuelQuotaService, private snackBar: MatSnackBar) { }
+  constructor(
+    private fb: FormBuilder,
+    private fuelQuotaService: FuelQuotaService,
+    private snackBar: MatSnackBar,
+    private authUserService: AuthUserService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
+    if(this.authUserService.hasData()){
+      this.router.navigate(['/dashboard']);
+      return;
+    }
     this.vehicleForm = this.fb.group({
       vehicleNo: [
         '',
@@ -76,7 +89,23 @@ export class VehicleFormComponent {
           Validators.maxLength(500),
         ],
       ],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(20),
+          Validators.pattern("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^\\d\\sA-Za-z]).{8,}$"),
+        ],
+      ],
+      confirmPassword: [
+        '',
+        [
+          Validators.required,
+        ],
+      ],
     });
+
+    this.vehicleForm.addValidators(matchPasswords("password", "confirmPassword"));
   }
 
   handleServerErrors(errorResponse: HttpErrorResponse): void {
@@ -98,11 +127,16 @@ export class VehicleFormComponent {
     }
   }
 
+  handleSuccess(response: any): void {
+    this.authUserService.setData(response);
+    this.snackBar.open('Successfully registered', 'Close', { duration: 3000 });
+    this.router.navigate(['/dashboard']);
+  }
+
   onSubmit(): void {
     if (this.vehicleForm.valid) {
-      console.log('Submitted:', this.vehicleForm.value);
       this.fuelQuotaService.registerVehicle(this.vehicleForm.value).subscribe({
-        next: response => console.log('Response:', response),
+        next: response => this.handleSuccess(response),
         error: err => this.handleServerErrors(err)
       });
     } else {

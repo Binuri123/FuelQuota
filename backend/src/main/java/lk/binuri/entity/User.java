@@ -28,35 +28,30 @@ public class User implements UserDetails {
     private UserType userType;
 
     @Override
-    @Transient
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
 
     @Override
-    @Transient
     @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
-    @Transient
     @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
-    @Transient
     @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
-    @Transient
     @JsonIgnore
     public boolean isEnabled() {
         return true;

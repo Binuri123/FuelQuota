@@ -15,6 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { HttpClientModule } from '@angular/common/http';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { HttpClientModule } from '@angular/common/http';
     LandingPageComponent,
     VehicleFormComponent,
     LoginComponent,
-    NotFoundPageComponent
+    NotFoundPageComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

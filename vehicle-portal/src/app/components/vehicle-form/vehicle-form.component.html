@@ -150,6 +150,41 @@
                         </mat-form-field>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Password</mat-label>
+                            <input matInput formControlName="password" required />
+                            <mat-error *ngIf="vehicleForm.get('password')?.hasError('pattern')">
+                                Password is not strong enough.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('password')?.hasError('maxlength')">
+                                Must be less than 20 characters.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('password')?.hasError('required')">
+                                Password is required.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('password')?.hasError('servererror')">
+                                {{vehicleForm.get('password')?.getError('servererror')}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field appearance="outline" class="w-100 mb-3">
+                            <mat-label>Confirm Password</mat-label>
+                            <input matInput formControlName="confirmPassword" required />
+                            <mat-error *ngIf="vehicleForm.get('confirmPassword')?.hasError('required')">
+                                Confirm Password is required.
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.get('confirmPassword')?.hasError('servererror')">
+                                {{vehicleForm.get('confirmPassword')?.getError('servererror')}}
+                            </mat-error>
+                            <mat-error *ngIf="vehicleForm.hasError('passwordMismatch')">
+                                Confirm password doesn't match with password.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </div>
                 <mat-form-field appearance="outline" class="w-100 mb-3">
                     <mat-label>Address</mat-label>
                     <textarea matInput formControlName="address" required></textarea>

@@ -69,4 +69,8 @@ public class Vehicle {
     @JsonIgnore
     @Column(name = "qr", columnDefinition = "MEDIUMBLOB")
     private byte[] qr;
+
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @OneToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private User user;
 }

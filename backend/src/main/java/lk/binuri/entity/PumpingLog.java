@@ -16,8 +16,12 @@ public class PumpingLog {
     private UUID id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "vehicle_id",nullable = false)
+    @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "fuel_station_id", nullable = false)
+    private FuelStation fuelStation;
 
     private Double amount;
 

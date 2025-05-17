@@ -31,6 +31,10 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user",fetch = FetchType.LAZY)
     private Vehicle vehicle;
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "user",fetch = FetchType.LAZY)
+    private FuelStation fuelStation;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

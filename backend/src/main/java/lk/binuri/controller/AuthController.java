@@ -52,6 +52,7 @@ public class AuthController {
                 authResponseDTO.setData(user.getVehicle());
                 break;
             case "FUEL_STATION":
+                authResponseDTO.setData(user.getFuelStation());
                 break;
             case "ADMIN":
                 break;

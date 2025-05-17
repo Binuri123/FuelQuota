@@ -26,6 +26,7 @@ import java.util.UUID;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/api/vehicle")
 public class VehicleController {
     private final VehicleRepository vehicleRepository;
     private final RmvMockApi rmvMockApi;
@@ -132,10 +133,5 @@ public class VehicleController {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    @GetMapping("/test")
-    public String test() {
-        return "Hello World";
     }
 }

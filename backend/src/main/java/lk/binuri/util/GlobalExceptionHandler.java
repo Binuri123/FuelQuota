@@ -31,6 +31,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(BadLoginException.class)
+    public ResponseEntity<Map<String, String>> handleLoginExceptions(BadLoginException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error",ex.getMessage());
+        return new ResponseEntity<>(errors, HttpStatus.UNAUTHORIZED);
+    }
+
     private static void handleGlobalValidationErrors(Map<String, String> errors, ObjectError error) {
         if (error.getCode().equals(PasswordMatches.class.getSimpleName())) {
             errors.put("confirmPassword", error.getDefaultMessage());

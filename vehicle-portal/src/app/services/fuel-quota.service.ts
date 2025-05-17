@@ -8,11 +8,16 @@ import { Observable } from 'rxjs';
 })
 export class FuelQuotaService {
 
-  private apiUrl = 'http://localhost:8080/'; // Replace with your real URL
+  private apiUrl = 'http://localhost:8080/api/'; // Replace with your real URL
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   registerVehicle(data: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl+"register", data);
+    return this.http.post<any>(this.apiUrl + "vehicle/register", data);
+  }
+
+  login(data: any): Observable<any> {
+    data['type'] = "VEHICLE";
+    return this.http.post<any>(this.apiUrl + "login", data);
   }
 }

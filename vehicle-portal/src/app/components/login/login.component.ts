@@ -3,7 +3,6 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { FuelQuotaService } from '../../services/fuel-quota.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { matchPasswords } from '../../validators/match-passwords';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Router } from '@angular/router';
 

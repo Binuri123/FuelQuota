@@ -1,1 +1,15 @@
-<p>dashboard works!</p>
+<div class="container mt-3">
+    <div class="card mx-auto bg-info" style="width:400px">
+        <div class="d-flex justify-content-center mt-3">
+            <img class="card-img-top" *ngIf="qrImage" [src]="qrImage" alt="QR Code" style="width:200px" />
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Quota Details</h4>
+            <p class="card-text">
+                <span>Allocated weekly quota: {{quota}}</span><br />
+                <span>Balance: {{balance}}</span>
+            </p>
+            <button type="button" class="btn btn-danger" (click)="logout()">Logout</button>
+        </div>
+    </div>
+</div>

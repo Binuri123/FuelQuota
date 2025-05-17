@@ -27,6 +27,10 @@ public class User implements UserDetails {
     @Column(name = "user_type", nullable = false, length = 20)
     private UserType userType;
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "user",fetch = FetchType.LAZY)
+    private Vehicle vehicle;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

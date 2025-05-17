@@ -2,9 +2,13 @@ package lk.binuri.controller;
 
 import com.google.zxing.WriterException;
 import jakarta.validation.Valid;
+import lk.binuri.dto.QuotaDetailsResponseDTO;
 import lk.binuri.dto.VehicleRegisterRequestDTO;
+import lk.binuri.entity.QuotaAllocation;
 import lk.binuri.entity.User;
 import lk.binuri.entity.Vehicle;
+import lk.binuri.repository.PumpingLogRepository;
+import lk.binuri.repository.QuotaAllocationRepository;
 import lk.binuri.repository.UserRepository;
 import lk.binuri.repository.VehicleRepository;
 import lk.binuri.dto.AuthResponseDTO;
@@ -13,6 +17,7 @@ import lk.binuri.security.UserType;
 import lk.binuri.service.QRCodeService;
 import lk.binuri.util.CustomErrorException;
 import lk.binuri.util.RmvMockApi;
+import lk.binuri.util.WeekUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,29 +27,38 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/api/vehicle")
 public class VehicleController {
     private final VehicleRepository vehicleRepository;
     private final RmvMockApi rmvMockApi;
     private final QRCodeService qrCodeService;
     private final JWTService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final QuotaAllocationRepository quotaAllocationRepository;
+    private final PumpingLogRepository pumpingLogRepository;
 
     public VehicleController(
             VehicleRepository vehicleRepository,
             RmvMockApi rmvMockApi,
             QRCodeService qrCodeService,
             JWTService jwtService,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            QuotaAllocationRepository quotaAllocationRepository,
+            PumpingLogRepository pumpingLogRepository
     ) {
         this.vehicleRepository = vehicleRepository;
         this.rmvMockApi = rmvMockApi;
         this.qrCodeService = qrCodeService;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.quotaAllocationRepository = quotaAllocationRepository;
+        this.pumpingLogRepository = pumpingLogRepository;
     }
 
     @PostMapping("/register")
@@ -134,8 +148,19 @@ public class VehicleController {
         }
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "Hello World";
+    @GetMapping("/quota-details")
+    public QuotaDetailsResponseDTO getQuotaDetails(Principal principal) {
+        String vehicleNo = principal.getName();
+        LocalDateTime startDate = WeekUtil.getStartOfWeek();
+        LocalDateTime endDate = WeekUtil.getEndOfWeek();
+
+        Vehicle vehicle = vehicleRepository.findByVehicleNo(vehicleNo);
+        QuotaAllocation quotaAllocation = quotaAllocationRepository.getReferenceById(vehicle.getType());
+        Optional<Double> pumpedAmount = pumpingLogRepository.getTotalFuelPumped(vehicleNo, startDate, endDate);
+
+        QuotaDetailsResponseDTO response = new QuotaDetailsResponseDTO();
+        response.setQuota(quotaAllocation.getAmount());
+        response.setBalance(quotaAllocation.getAmount() - pumpedAmount.orElse(0.0));
+        return response;
     }
 }

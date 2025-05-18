@@ -1,9 +1,5 @@
 package lk.binuri.controller;
 
-import com.google.zxing.ChecksumException;
-import com.google.zxing.FormatException;
-import com.google.zxing.NotFoundException;
-import com.google.zxing.WriterException;
 import jakarta.validation.Valid;
 import lk.binuri.dto.*;
 import lk.binuri.entity.FuelStation;
@@ -14,14 +10,12 @@ import lk.binuri.repository.FuelStationRepository;
 import lk.binuri.repository.PumpingLogRepository;
 import lk.binuri.repository.QuotaAllocationRepository;
 import lk.binuri.repository.VehicleRepository;
-import lk.binuri.service.QRCodeService;
 import lk.binuri.service.SMSService;
 import lk.binuri.util.CustomErrorException;
 import lk.binuri.util.WeekUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,10 +32,9 @@ public class PumpingController {
     private final VehicleRepository vehicleRepository;
     private final FuelStationRepository fuelStationRepository;
     private final SMSService smsService;
-    private final QRCodeService qrCodeService;
 
     @PostMapping
-    public PumpingLogResponseDTO insert(@RequestBody @Valid PumpingLogDTO pumpingLogDTO, Principal principal) throws IOException, WriterException {
+    public PumpingLogResponseDTO insert(@RequestBody @Valid PumpingLogDTO pumpingLogDTO, Principal principal) {
         CustomErrorException customErrorException = new CustomErrorException();
         Vehicle vehicle = vehicleRepository.findByVehicleNo(pumpingLogDTO.getVehicleNo());
 
@@ -95,19 +88,9 @@ public class PumpingController {
         return response;
     }
 
-    @PostMapping("/vehicle-details")
-    public PumpingVehicleResponseDTO getVehicleDetails(@RequestBody PumpingVehicleRequestDTO request) {
+    @GetMapping("/vehicle-details/{vehicleNo}")
+    public PumpingVehicleResponseDTO getVehicleDetails(@PathVariable String vehicleNo) {
         CustomErrorException customErrorException = new CustomErrorException();
-        String vehicleNo;
-        try {
-            vehicleNo = qrCodeService.decodeVehicleNoFromBase64QRCode(request.getQrBase64());
-        } catch (Exception e) {
-            customErrorException.addError("qrBase64", "QR decode Failed");
-            throw customErrorException;
-        }
-
-        LocalDateTime startDate = WeekUtil.getStartOfWeek();
-        LocalDateTime endDate = WeekUtil.getEndOfWeek();
 
         Vehicle vehicle = vehicleRepository.findByVehicleNo(vehicleNo);
         if (vehicle == null) {
@@ -115,7 +98,14 @@ public class PumpingController {
             throw customErrorException;
         }
 
-        QuotaAllocation quotaAllocation = quotaAllocationRepository.getReferenceById(vehicle.getType());
+        QuotaAllocation quotaAllocation = quotaAllocationRepository.findById(vehicle.getType()).orElse(null);
+        if (quotaAllocation == null) {
+            customErrorException.addError("vehicleNo", "Unable to find quota allocation for vehicle type: " + vehicle.getType());
+            throw customErrorException;
+        }
+
+        LocalDateTime startDate = WeekUtil.getStartOfWeek();
+        LocalDateTime endDate = WeekUtil.getEndOfWeek();
         Optional<Double> pumpedAmount = pumpingLogRepository.getTotalFuelPumped(vehicleNo, startDate, endDate);
 
         QuotaDetailsResponseDTO quotaDetails = new QuotaDetailsResponseDTO();

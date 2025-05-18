@@ -2,6 +2,7 @@ package lk.binuri.controller;
 
 import com.google.zxing.WriterException;
 import jakarta.validation.Valid;
+import lk.binuri.dto.AuthResponseDTO;
 import lk.binuri.dto.QuotaDetailsResponseDTO;
 import lk.binuri.dto.VehicleRegisterRequestDTO;
 import lk.binuri.entity.QuotaAllocation;
@@ -9,9 +10,7 @@ import lk.binuri.entity.User;
 import lk.binuri.entity.Vehicle;
 import lk.binuri.repository.PumpingLogRepository;
 import lk.binuri.repository.QuotaAllocationRepository;
-import lk.binuri.repository.UserRepository;
 import lk.binuri.repository.VehicleRepository;
-import lk.binuri.dto.AuthResponseDTO;
 import lk.binuri.security.JWTService;
 import lk.binuri.security.UserType;
 import lk.binuri.service.QRCodeService;
@@ -21,7 +20,6 @@ import lk.binuri.util.WeekUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +27,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @CrossOrigin
 @RestController

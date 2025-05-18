@@ -5,7 +5,6 @@ import lk.binuri.dto.AuthRequestDTO;
 import lk.binuri.dto.AuthResponseDTO;
 import lk.binuri.entity.User;
 import lk.binuri.repository.UserRepository;
-import lk.binuri.repository.VehicleRepository;
 import lk.binuri.security.JWTService;
 import lk.binuri.util.BadLoginException;
 import org.springframework.security.crypto.password.PasswordEncoder;

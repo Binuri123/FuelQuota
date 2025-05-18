@@ -1,6 +1,6 @@
 package lk.binuri.dto;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

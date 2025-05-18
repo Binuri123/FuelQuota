@@ -1,9 +1,11 @@
 package lk.binuri.controller;
 
+import com.google.zxing.ChecksumException;
+import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
 import jakarta.validation.Valid;
-import lk.binuri.dto.PumpingLogDTO;
-import lk.binuri.dto.PumpingLogResponseDTO;
+import lk.binuri.dto.*;
 import lk.binuri.entity.FuelStation;
 import lk.binuri.entity.PumpingLog;
 import lk.binuri.entity.QuotaAllocation;
@@ -12,6 +14,7 @@ import lk.binuri.repository.FuelStationRepository;
 import lk.binuri.repository.PumpingLogRepository;
 import lk.binuri.repository.QuotaAllocationRepository;
 import lk.binuri.repository.VehicleRepository;
+import lk.binuri.service.QRCodeService;
 import lk.binuri.service.SMSService;
 import lk.binuri.util.CustomErrorException;
 import lk.binuri.util.WeekUtil;
@@ -35,6 +38,7 @@ public class PumpingController {
     private final VehicleRepository vehicleRepository;
     private final FuelStationRepository fuelStationRepository;
     private final SMSService smsService;
+    private final QRCodeService qrCodeService;
 
     @PostMapping
     public PumpingLogResponseDTO insert(@RequestBody @Valid PumpingLogDTO pumpingLogDTO, Principal principal) throws IOException, WriterException {
@@ -88,6 +92,40 @@ public class PumpingController {
 
         PumpingLogResponseDTO response = new PumpingLogResponseDTO();
         response.setSuccess(true);
+        return response;
+    }
+
+    @PostMapping("/vehicle-details")
+    public PumpingVehicleResponseDTO getVehicleDetails(@RequestBody PumpingVehicleRequestDTO request) {
+        CustomErrorException customErrorException = new CustomErrorException();
+        String vehicleNo;
+        try {
+            vehicleNo = qrCodeService.decodeVehicleNoFromBase64QRCode(request.getQrBase64());
+        } catch (Exception e) {
+            customErrorException.addError("qrBase64", "QR decode Failed");
+            throw customErrorException;
+        }
+
+        LocalDateTime startDate = WeekUtil.getStartOfWeek();
+        LocalDateTime endDate = WeekUtil.getEndOfWeek();
+
+        Vehicle vehicle = vehicleRepository.findByVehicleNo(vehicleNo);
+        if (vehicle == null) {
+            customErrorException.addError("vehicleNo", "Vehicle number is not registered yet");
+            throw customErrorException;
+        }
+
+        QuotaAllocation quotaAllocation = quotaAllocationRepository.getReferenceById(vehicle.getType());
+        Optional<Double> pumpedAmount = pumpingLogRepository.getTotalFuelPumped(vehicleNo, startDate, endDate);
+
+        QuotaDetailsResponseDTO quotaDetails = new QuotaDetailsResponseDTO();
+        quotaDetails.setQuota(quotaAllocation.getAmount());
+        quotaDetails.setBalance(quotaAllocation.getAmount() - pumpedAmount.orElse(0.0));
+
+        PumpingVehicleResponseDTO response = new PumpingVehicleResponseDTO();
+        response.setVehicleNo(vehicleNo);
+        response.setQuotaDetails(quotaDetails);
+
         return response;
     }
 }

@@ -1,17 +1,22 @@
 package lk.binuri.service;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
+import com.google.zxing.*;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.qrcode.QRCodeReader;
 import com.google.zxing.qrcode.QRCodeWriter;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,5 +53,38 @@ public class QRCodeService {
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
 
         return outputStream.toByteArray();
+    }
+
+    public String decodeVehicleNoFromBase64QRCode(String base64Image) throws IOException, NotFoundException, ChecksumException, FormatException {
+        // Step 1: Remove data URI prefix if present
+        if (base64Image.startsWith("data:image")) {
+            int commaIndex = base64Image.indexOf(",");
+            base64Image = base64Image.substring(commaIndex + 1);
+        }
+
+        // Step 2: Decode Base64
+        byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+
+        // Step 3: Convert bytes to BufferedImage
+        ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
+        BufferedImage bufferedImage = ImageIO.read(bis);
+        if (bufferedImage == null) {
+            throw new IOException("Could not decode image");
+        }
+
+        // Step 4: Decode QR code using ZXing
+        LuminanceSource source = new BufferedImageLuminanceSource(bufferedImage);
+        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+        QRCodeReader reader = new QRCodeReader();
+        Result result = reader.decode(bitmap);
+
+        // Step 5: Extract vehicle number (before '|')
+        String fullText = result.getText();
+        String[] parts = fullText.split("\\|");
+        if (parts.length > 0) {
+            return parts[0]; // Vehicle number
+        } else {
+            throw new IOException("Invalid QR content format");
+        }
     }
 }
